@@ -1,6 +1,7 @@
 package pbo;
+package pbo.model;
 import javax.persistence.*;
-
+import java.util.*;
 /**
  * Mabel Christoffel A.S - 12S23011
  * Amos Manurung - 12S23027
