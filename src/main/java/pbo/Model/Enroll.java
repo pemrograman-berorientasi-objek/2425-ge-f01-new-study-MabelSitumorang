@@ -1,4 +1,3 @@
-package pbo;
 package pbo.model;
 import javax.persistence.*;
 import java.util.*;

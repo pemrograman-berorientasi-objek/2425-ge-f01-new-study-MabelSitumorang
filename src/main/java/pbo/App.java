@@ -92,7 +92,7 @@ public class App {
             .getResultList();
 
         if (courses.isEmpty()) {
-          Course course = new Course(idCourse, courseName, semester, Kredit);
+          Course course = new Course(idCourse, courseName, semester, kredit);
 
           entityManager.getTransaction().begin();
           entityManager.persist(course);
