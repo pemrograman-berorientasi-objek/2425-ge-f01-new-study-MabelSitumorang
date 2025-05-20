@@ -1,12 +1,15 @@
 package pbo.model;
+
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.FetchType;
+import javax.persistence.CascadeType;
+
 
 /**
  * Mabel Christoffel A.S - 12S23011
@@ -18,87 +21,98 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "courses")
 public class Course {
-
+    
     @Id
-    @Column(name = "code", nullable = false, unique = true)
+    @Column(name = "kode", nullable = false)
     private String courseCode;
-
-    @Column(name = "name", nullable = false)
+    
+    @Column(name = "nama", nullable = false)
     private String courseName;
-
+    
     @Column(name = "semester", nullable = false)
-    private int semester;
-
-    @Column(name = "credits", nullable = false)
-    private int credits;
-
-    @ManyToMany(mappedBy = "courses", fetch = FetchType.EAGER)
-    private List<Student> students = new ArrayList<>();
-
-    public Course() {
-    }
-
-    public Course(String courseCode, String courseName, int semester, int credits) {
+    private int courseSemester;
+    
+    @Column(name = "kredit", nullable = false)
+    private int courseCredit;
+    
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Enrollment> enrollmentList = new ArrayList<>();
+    
+    
+    public Course(String courseCode, String courseName, int courseSemester, int courseCredit) {
         this.courseCode = courseCode;
         this.courseName = courseName;
-        this.semester = semester;
-        this.credits = credits;
+        this.courseSemester = courseSemester;
+        this.courseCredit = courseCredit;
     }
-
-    public String getCode() {
+   
+    public String getCourseCode() {
         return courseCode;
     }
+    
 
-    public void setCode(String courseCode) {
+    public void setCourseCode(String courseCode) {
         this.courseCode = courseCode;
     }
+    
 
-    public String getName() {
+    public String getCourseName() {
         return courseName;
     }
-
-    public void setName(String courseName) {
+  
+    public void setCourseName(String courseName) {
         this.courseName = courseName;
     }
-
-    public int getSemester() {
-        return semester;
+    
+    public int getCourseSemester() {
+        return courseSemester;
     }
-
-    public void setSemester(int semester) {
-        this.semester = semester;
+    
+    public void setCourseSemester(int courseSemester) {
+        this.courseSemester = courseSemester;
     }
+    
 
-    public int getCredits() {
-        return credits;
+    public int getCourseCredit() {
+        return courseCredit;
     }
-
-    public void setCredits(int credits) {
-        this.credits = credits;
+  
+    public void setCourseCredit(int courseCredit) {
+        this.courseCredit = courseCredit;
     }
+    
 
-    public List<Student> getStudents() {
-        return students;
+    public List<Enrollment> getEnrollmentList() {
+        return enrollmentList;
     }
-
-    public void setStudents(List<Student> students) {
-        this.students = students;
+    
+    public void setEnrollmentList(List<Enrollment> enrollmentList) {
+        this.enrollmentList = enrollmentList;
     }
-
+    
+    public void addEnrollment(Enrollment enrollment) {
+        enrollmentList.add(enrollment);
+        enrollment.setEnrolledCourse(this); 
+    }
+    
     @Override
     public String toString() {
-        return courseCode + "|" + courseName + "|" + semester + "|" + credits;
+        return courseCode + "|" + courseName + "|" + courseSemester + "|" + courseCredit;
     }
-
+    
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Course course = (Course) o;
-        return courseCode.equals(course.courseCode);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        
+        Course other = (Course) obj;
+        return courseCode.equals(other.courseCode);
     }
-
+    
     @Override
     public int hashCode() {
         return courseCode.hashCode();

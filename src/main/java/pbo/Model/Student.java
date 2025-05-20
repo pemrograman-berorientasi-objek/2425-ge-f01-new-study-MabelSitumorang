@@ -18,19 +18,20 @@ import javax.persistence.JoinColumn;
  *
  */
 
+
 @Entity
 @Table(name = "students")
 public class Student {
     
     @Id
     @Column(name = "nim", nullable = false)
-    private String idSiswa;
+    private String studentId;
     
     @Column(name = "nama", nullable = false)
-    private String namaLengkap;
+    private String fullName;
     
     @Column(name = "prodi", nullable = false)
-    private String jurusan;
+    private String studyProgram;
     
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(
@@ -38,49 +39,49 @@ public class Student {
         joinColumns = @JoinColumn(name = "student_nim"),
         inverseJoinColumns = @JoinColumn(name = "course_code")
     )
-    private List<Course> daftarMatkul = new ArrayList<>();
+    private List<Course> enrolledCourses = new ArrayList<>();
 
-    public Student(String idSiswa, String namaLengkap, String jurusan) {
-        this.idSiswa = idSiswa;
-        this.namaLengkap = namaLengkap;
-        this.jurusan = jurusan;
+    public Student(String studentId, String fullName, String studyProgram) {
+        this.studentId = studentId;
+        this.fullName = fullName;
+        this.studyProgram = studyProgram;
     }
     
-    public String getNim() {
-        return idSiswa;
+    public String getStudentId() {
+        return studentId;
     }
 
-    public void setNim(String idSiswa) {
-        this.idSiswa = idSiswa;
+    public void setStudentId(String studentId) {
+        this.studentId = studentId;
     }
 
-    public String getNama() {
-        return namaLengkap;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setNama(String namaLengkap) {
-        this.namaLengkap = namaLengkap;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
-    public String getProdi() {
-        return jurusan;
+    public String getStudyProgram() {
+        return studyProgram;
     }
 
-    public void setProdi(String jurusan) {
-        this.jurusan = jurusan;
+    public void setStudyProgram(String studyProgram) {
+        this.studyProgram = studyProgram;
     }
 
-    public List<Course> getCourses() {
-        return daftarMatkul;
+    public List<Course> getEnrolledCourses() {
+        return enrolledCourses;
     }
 
-    public void setCourses(List<Course> daftarMatkul) {
-        this.daftarMatkul = daftarMatkul;
+    public void setEnrolledCourses(List<Course> enrolledCourses) {
+        this.enrolledCourses = enrolledCourses;
     }
 
-    public boolean enrollCourse(Course matkul) {
-        if (!daftarMatkul.contains(matkul)) {
-            daftarMatkul.add(matkul);
+    public boolean enrollInCourse(Course course) {
+        if (!enrolledCourses.contains(course)) {
+            enrolledCourses.add(course);
             return true;
         }
         return false;
@@ -88,7 +89,7 @@ public class Student {
 
     @Override
     public String toString() {
-        return idSiswa + "|" + namaLengkap + "|" + jurusan;
+        return studentId + "|" + fullName + "|" + studyProgram;
     }
 
     @Override
@@ -101,12 +102,12 @@ public class Student {
         }
         
         Student student = (Student) obj;
-        return idSiswa.equals(student.idSiswa);
+        return studentId.equals(student.studentId);
     }
     
 
     @Override
     public int hashCode() {
-        return idSiswa.hashCode();
+        return studentId.hashCode();
     }
 }

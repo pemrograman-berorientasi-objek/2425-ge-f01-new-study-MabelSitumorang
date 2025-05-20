@@ -12,43 +12,43 @@ import javax.persistence.Table;
  *
  */
 
+
 @Entity
 @Table(name = "enrollments")
-
 public class Enrollment implements Serializable {
     
     @Id
     @ManyToOne
     @JoinColumn(name = "student_nim", referencedColumnName = "nim")
-    private Student student;
+    private Student enrolledStudent;
     
     @Id
     @ManyToOne
     @JoinColumn(name = "course_code", referencedColumnName = "kode")
-    private Course course;
+    private Course enrolledCourse;
 
     public Enrollment() {
     }
 
-    public Enrollment(Student student, Course course) {
-        this.student = student;
-        this.course = course;
+    public Enrollment(Student enrolledStudent, Course enrolledCourse) {
+        this.enrolledStudent = enrolledStudent;
+        this.enrolledCourse = enrolledCourse;
     }
 
-    public Student getStudent() {
-        return student;
+    public Student getEnrolledStudent() {
+        return enrolledStudent;
     }
 
-    public void setStudent(Student student) {
-        this.student = student;
+    public void setEnrolledStudent(Student enrolledStudent) {
+        this.enrolledStudent = enrolledStudent;
     }
 
-    public Course getCourse() {
-        return course;
+    public Course getEnrolledCourse() {
+        return enrolledCourse;
     }
 
-    public void setCourse(Course course) {
-        this.course = course;
+    public void setEnrolledCourse(Course enrolledCourse) {
+        this.enrolledCourse = enrolledCourse;
     }
     
     @Override
@@ -61,11 +61,11 @@ public class Enrollment implements Serializable {
         }
         
         Enrollment that = (Enrollment) obj;
-        return student.equals(that.student) && course.equals(that.course);
+        return enrolledStudent.equals(that.enrolledStudent) && enrolledCourse.equals(that.enrolledCourse);
     }
     
     @Override
     public int hashCode() {
-        return 31 * student.hashCode() + course.hashCode();
+        return 31 * enrolledStudent.hashCode() + enrolledCourse.hashCode();
     }
 }

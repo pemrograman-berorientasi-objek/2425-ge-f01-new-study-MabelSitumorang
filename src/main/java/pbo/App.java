@@ -12,6 +12,7 @@ import pbo.model.Student;
  *
  */
 
+
 public class App {
     public static void main(String[] args) {
         Scanner inputScanner = new Scanner(System.in);
@@ -25,83 +26,83 @@ public class App {
             if (inputLine.equals("---")) break;
 
             String[] tokens = inputLine.split("#");
-            String perintah = tokens[0];
+            String action = tokens[0];
 
-            switch (perintah) {
+            switch (action) {
                 case "student-add":
-                    String idMahasiswa = tokens[1];
-                    String namaMahasiswa = tokens[2];
-                    String programStudi = tokens[3];
+                    String studentId = tokens[1];
+                    String fullName = tokens[2];
+                    String studyProgram = tokens[3];
 
-                    if (!studentMap.containsKey(idMahasiswa)) {
-                        studentMap.put(idMahasiswa, new Student(idMahasiswa, namaMahasiswa, programStudi));
+                    if (!studentMap.containsKey(studentId)) {
+                        studentMap.put(studentId, new Student(studentId, fullName, studyProgram));
                     }
                     break;
 
                 case "student-show-all":
-                    for (Student mhs : studentMap.values()) {
-                        System.out.println(mhs.getNim() + "|" + mhs.getNama() + "|" + mhs.getProdi());
+                    for (Student s : studentMap.values()) {
+                        System.out.println(s.getStudentId() + "|" + s.getFullName() + "|" + s.getStudyProgram());
                     }
                     break;
 
                 case "course-add":
-                    String kodeMatkul = tokens[1];
-                    String namaMatkul = tokens[2];
-                    int semesterMatkul = Integer.parseInt(tokens[3]);
-                    int jumlahKredit = Integer.parseInt(tokens[4]);
+                    String courseCode = tokens[1];
+                    String courseName = tokens[2];
+                    int courseSemester = Integer.parseInt(tokens[3]);
+                    int courseCredit = Integer.parseInt(tokens[4]);
 
-                    if (!courseMap.containsKey(kodeMatkul)) {
-                        courseMap.put(kodeMatkul, new Course(kodeMatkul, namaMatkul, semesterMatkul, jumlahKredit));
+                    if (!courseMap.containsKey(courseCode)) {
+                        courseMap.put(courseCode, new Course(courseCode, courseName, courseSemester, courseCredit));
                     }
                     break;
 
                 case "course-show-all":
-                    for (Course matkul : courseMap.values()) {
-                        System.out.println(matkul.getKode() + "|" + matkul.getNama() + "|" + matkul.getSemester() + "|" + matkul.getKredit());
+                    for (Course c : courseMap.values()) {
+                        System.out.println(c.getCourseCode() + "|" + c.getCourseName() + "|" + c.getCourseSemester() + "|" + c.getCourseCredit());
                     }
                     break;
 
                 case "enroll":
-                    String nimEnroll = tokens[1];
-                    String kodeEnroll = tokens[2];
-                    Student mahasiswaEnroll = studentMap.get(nimEnroll);
-                    Course matkulEnroll = courseMap.get(kodeEnroll);
+                    String enrollStudentId = tokens[1];
+                    String enrollCourseCode = tokens[2];
+                    Student enrollStudent = studentMap.get(enrollStudentId);
+                    Course enrollCourse = courseMap.get(enrollCourseCode);
 
-                    if (mahasiswaEnroll != null && matkulEnroll != null) {
-                        boolean sudahTerdaftar = false;
-                        for (Enrollment daftar : enrollmentList) {
-                            if (daftar.getStudent().getNim().equals(nimEnroll) &&
-                                daftar.getCourse().getKode().equals(kodeEnroll)) {
-                                sudahTerdaftar = true;
+                    if (enrollStudent != null && enrollCourse != null) {
+                        boolean alreadyEnrolled = false;
+                        for (Enrollment e : enrollmentList) {
+                            if (e.getEnrolledStudent().getStudentId().equals(enrollStudentId) &&
+                                e.getEnrolledCourse().getCourseCode().equals(enrollCourseCode)) {
+                                alreadyEnrolled = true;
                                 break;
                             }
                         }
-                        if (!sudahTerdaftar) {
-                            enrollmentList.add(new Enrollment(mahasiswaEnroll, matkulEnroll));
+                        if (!alreadyEnrolled) {
+                            enrollmentList.add(new Enrollment(enrollStudent, enrollCourse));
                         }
                     }
                     break;
 
                 case "student-show":
-                    String nimTarget = tokens[1];
-                    Student mahasiswaTarget = studentMap.get(nimTarget);
-                    if (mahasiswaTarget != null) {
-                        System.out.println(mahasiswaTarget.getNim() + "|" + mahasiswaTarget.getNama() + "|" + mahasiswaTarget.getProdi());
+                    String showStudentId = tokens[1];
+                    Student showStudent = studentMap.get(showStudentId);
+                    if (showStudent != null) {
+                        System.out.println(showStudent.getStudentId() + "|" + showStudent.getFullName() + "|" + showStudent.getStudyProgram());
 
-                        List<Course> daftarMatkul = new ArrayList<>();
-                        for (Enrollment daftar : enrollmentList) {
-                            if (daftar.getStudent().getNim().equals(nimTarget)) {
-                                Course c = daftar.getCourse();
+                        List<Course> studentCourses = new ArrayList<>();
+                        for (Enrollment e : enrollmentList) {
+                            if (e.getEnrolledStudent().getStudentId().equals(showStudentId)) {
+                                Course c = e.getEnrolledCourse();
                                 if (c != null) {
-                                    daftarMatkul.add(c);
+                                    studentCourses.add(c);
                                 }
                             }
                         }
 
-                        daftarMatkul.sort(Comparator.comparing(Course::getKode));
+                        studentCourses.sort(Comparator.comparing(Course::getCourseCode));
 
-                        for (Course c : daftarMatkul) {
-                            System.out.println(c.getKode() + "|" + c.getNama() + "|" + c.getSemester() + "|" + c.getKredit());
+                        for (Course c : studentCourses) {
+                            System.out.println(c.getCourseCode() + "|" + c.getCourseName() + "|" + c.getCourseSemester() + "|" + c.getCourseCredit());
                         }
                     }
                     break;
