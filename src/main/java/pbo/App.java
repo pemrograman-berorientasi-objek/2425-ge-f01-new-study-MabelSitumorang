@@ -1,133 +1,115 @@
 package pbo;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import java.util.*;
-import java.util.Scanner;
 
-import pbo.model.*;
+import java.util.*;
+
+import pbo.model.Course;
+import pbo.model.Enrollment;
+import pbo.model.Student;
 
 /**
  * Mabel Christoffel A.S - 12S23011
  * Amos Manurung - 12S23027
  *
  */
+
 public class App {
+    public static void main(String[] args) {
+        Scanner inputScanner = new Scanner(System.in);
 
-  private static EntityManagerFactory factory;
-  private static EntityManager entityManager;
+        Map<String, Student> studentMap = new TreeMap<>();
+        Map<String, Course> courseMap = new TreeMap<>();
+        List<Enrollment> enrollmentList = new ArrayList<>();
 
-  public static void main(String[] _args) {
-    Scanner masukan = new Scanner(System.in);
+        while (inputScanner.hasNextLine()) {
+            String inputLine = inputScanner.nextLine().trim();
+            if (inputLine.equals("---")) break;
 
-    factory = Persistence.createEntityManagerFactory("study_plan_pu");
-    entityManager = factory.createEntityManager();
+            String[] tokens = inputLine.split("#");
+            String perintah = tokens[0];
 
-    int ide = 0;
+            switch (perintah) {
+                case "student-add":
+                    String idMahasiswa = tokens[1];
+                    String namaMahasiswa = tokens[2];
+                    String programStudi = tokens[3];
 
-    while (masukan.hasNext()) {
-      String input = masukan.nextLine();
-      if (input.equals("---")) {
-        break;
-      }
+                    if (!studentMap.containsKey(idMahasiswa)) {
+                        studentMap.put(idMahasiswa, new Student(idMahasiswa, namaMahasiswa, programStudi));
+                    }
+                    break;
 
-      String[] inputArr = input.split("#");
-      String command = inputArr[0];
-      if (command.equals("student-add")) {
-        String NIM = inputArr[1];
-        String nama = inputArr[2];
-        String prodi = inputArr[3];
+                case "student-show-all":
+                    for (Student mhs : studentMap.values()) {
+                        System.out.println(mhs.getNim() + "|" + mhs.getNama() + "|" + mhs.getProdi());
+                    }
+                    break;
 
-        List<Student> students = entityManager.createQuery(
-            "SELECT student FROM Student student WHERE student.NIM = :NIM", Student.class)
-            .setParameter("NIM", NIM)
-            .getResultList();
+                case "course-add":
+                    String kodeMatkul = tokens[1];
+                    String namaMatkul = tokens[2];
+                    int semesterMatkul = Integer.parseInt(tokens[3]);
+                    int jumlahKredit = Integer.parseInt(tokens[4]);
 
-        if (students.isEmpty()) {
-          Student student = new Student(NIM, nama, prodi);
+                    if (!courseMap.containsKey(kodeMatkul)) {
+                        courseMap.put(kodeMatkul, new Course(kodeMatkul, namaMatkul, semesterMatkul, jumlahKredit));
+                    }
+                    break;
 
-          entityManager.getTransaction().begin();
-          entityManager.persist(student);
-          entityManager.getTransaction().commit();
-        }
-      } else if (command.equals("student-show")) {
-        String NIM = inputArr[1];
-        List<Student> students = entityManager.createQuery(
-            "SELECT student FROM Student student WHERE student.NIM = :NIM", Student.class)
-            .setParameter("NIM", NIM)
-            .getResultList();
-        for (Student student : students) {
-          System.out.println(student.getNIM() + "|" + student.getNama() + "|" + student.getProdi());
-          List<Enroll> enrolls = entityManager.createQuery(
-              "SELECT enroll FROM Enroll enroll WHERE enroll.NIMM = :NIM ORDER BY enroll.idCoursee ASC", Enroll.class)
-              .setParameter("NIM", student.getNIM())
-              .getResultList();
-          for (Enroll enroll : enrolls) {
-            List<Course> courses = entityManager.createQuery(
-                "SELECT course FROM Course course WHERE course.idCourse = :idCourse", Course.class)
-                .setParameter("idCourse", enroll.getIdCoursee())
-                .getResultList();
-            for (Course course : courses) {
-              System.out.println(course.getIdCourse() + "|" + course.getCourseName() + "|" + course.getSemester() + "|"
-                  + course.getKredit());
+                case "course-show-all":
+                    for (Course matkul : courseMap.values()) {
+                        System.out.println(matkul.getKode() + "|" + matkul.getNama() + "|" + matkul.getSemester() + "|" + matkul.getKredit());
+                    }
+                    break;
+
+                case "enroll":
+                    String nimEnroll = tokens[1];
+                    String kodeEnroll = tokens[2];
+                    Student mahasiswaEnroll = studentMap.get(nimEnroll);
+                    Course matkulEnroll = courseMap.get(kodeEnroll);
+
+                    if (mahasiswaEnroll != null && matkulEnroll != null) {
+                        boolean sudahTerdaftar = false;
+                        for (Enrollment daftar : enrollmentList) {
+                            if (daftar.getStudent().getNim().equals(nimEnroll) &&
+                                daftar.getCourse().getKode().equals(kodeEnroll)) {
+                                sudahTerdaftar = true;
+                                break;
+                            }
+                        }
+                        if (!sudahTerdaftar) {
+                            enrollmentList.add(new Enrollment(mahasiswaEnroll, matkulEnroll));
+                        }
+                    }
+                    break;
+
+                case "student-show":
+                    String nimTarget = tokens[1];
+                    Student mahasiswaTarget = studentMap.get(nimTarget);
+                    if (mahasiswaTarget != null) {
+                        System.out.println(mahasiswaTarget.getNim() + "|" + mahasiswaTarget.getNama() + "|" + mahasiswaTarget.getProdi());
+
+                        List<Course> daftarMatkul = new ArrayList<>();
+                        for (Enrollment daftar : enrollmentList) {
+                            if (daftar.getStudent().getNim().equals(nimTarget)) {
+                                Course c = daftar.getCourse();
+                                if (c != null) {
+                                    daftarMatkul.add(c);
+                                }
+                            }
+                        }
+
+                        daftarMatkul.sort(Comparator.comparing(Course::getKode));
+
+                        for (Course c : daftarMatkul) {
+                            System.out.println(c.getKode() + "|" + c.getNama() + "|" + c.getSemester() + "|" + c.getKredit());
+                        }
+                    }
+                    break;
+
+                default:
+                    break;
             }
-          }
         }
-      } else if (command.equals("student-show-all")) {
-        List<Student> students = entityManager.createQuery(
-            "SELECT student FROM Student student ORDER BY student.NIM ASC", Student.class)
-            .getResultList();
-        for (Student student : students) {
-          System.out.println(student.getNIM() + "|" + student.getNama() + "|" + student.getProdi());
-        }
-      } else if (command.equals("course-add")) {
-        String idCourse = inputArr[1];
-        String courseName = inputArr[2];
-        String semester = inputArr[3];
-        String kredit = inputArr[4];
-
-        List<Course> courses = entityManager.createQuery(
-            "SELECT course FROM Course course WHERE course.idCourse = :idCourse", Course.class)
-            .setParameter("idCourse", idCourse)
-            .getResultList();
-
-        if (courses.isEmpty()) {
-          Course course = new Course(idCourse, courseName, semester, kredit);
-
-          entityManager.getTransaction().begin();
-          entityManager.persist(course);
-          entityManager.getTransaction().commit();
-        }
-      } else if (command.equals("course-show-all")) {
-        List<Course> courses = entityManager.createQuery(
-            "SELECT course FROM Course course ORDER BY course.idCourse ASC", Course.class)
-            .getResultList();
-        for (Course course : courses) {
-          System.out.println(course.getIdCourse() + "|" + course.getCourseName() + "|" + course.getSemester() + "|"
-              + course.getKredit());
-        }
-      } else if (command.equals("enroll")) {
-        String NIMM = inputArr[1];
-        String idCoursee = inputArr[2];
-        ide++;
-        Enroll enroll = new Enroll(ide, NIMM, idCoursee);
-
-        entityManager.getTransaction().begin();
-        entityManager.persist(enroll);
-        entityManager.getTransaction().commit();
-      }
+        inputScanner.close();
     }
-    entityManager.getTransaction().begin();
-    entityManager.createQuery("DELETE FROM Student student").executeUpdate();
-    entityManager.getTransaction().commit();
-    entityManager.getTransaction().begin();
-    entityManager.createQuery("DELETE FROM Course course").executeUpdate();
-    entityManager.getTransaction().commit();
-    entityManager.getTransaction().begin();
-    entityManager.createQuery("DELETE FROM Enroll enroll").executeUpdate();
-    entityManager.getTransaction().commit();
-    entityManager.close();
-    masukan.close();
-  }
 }
-

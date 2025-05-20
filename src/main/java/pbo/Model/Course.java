@@ -1,52 +1,106 @@
 package pbo.model;
-
-import java.util.*;
-import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 
 /**
  * Mabel Christoffel A.S - 12S23011
  * Amos Manurung - 12S23027
  *
  */
+
+
 @Entity
-@Table(name = "Course")
+@Table(name = "courses")
 public class Course {
-  @Id
-  @Column(name = "idCourse", nullable = false, length = 100)
-  private String idCourse;
 
-  @Column(name = "courseName", nullable = false, length = 100)
-  private String courseName;
+    @Id
+    @Column(name = "code", nullable = false, unique = true)
+    private String courseCode;
 
-  @Column(name = "semester", nullable = false, length = 100)
-  private String semester;
+    @Column(name = "name", nullable = false)
+    private String courseName;
 
-  @Column(name = "kredit", nullable = false, length = 100)
-  private String kredit;
+    @Column(name = "semester", nullable = false)
+    private int semester;
 
-  public Course() {
-  }
+    @Column(name = "credits", nullable = false)
+    private int credits;
 
-  public Course(String idCourse, String courseName, String semester, String kredit) {
-    this.idCourse = idCourse;
-    this.courseName = courseName;
-    this.semester = semester;
-    this.kredit = kredit;
-  }
+    @ManyToMany(mappedBy = "courses", fetch = FetchType.EAGER)
+    private List<Student> students = new ArrayList<>();
 
-  public String getIdCourse() {
-    return this.idCourse;
-  }
+    public Course() {
+    }
 
-  public String getCourseName() {
-    return this.courseName;
-  }
+    public Course(String courseCode, String courseName, int semester, int credits) {
+        this.courseCode = courseCode;
+        this.courseName = courseName;
+        this.semester = semester;
+        this.credits = credits;
+    }
 
-  public String getSemester() {
-    return this.semester;
-  }
+    public String getCode() {
+        return courseCode;
+    }
 
-  public String getKredit() {
-    return this.kredit;
-  }
+    public void setCode(String courseCode) {
+        this.courseCode = courseCode;
+    }
+
+    public String getName() {
+        return courseName;
+    }
+
+    public void setName(String courseName) {
+        this.courseName = courseName;
+    }
+
+    public int getSemester() {
+        return semester;
+    }
+
+    public void setSemester(int semester) {
+        this.semester = semester;
+    }
+
+    public int getCredits() {
+        return credits;
+    }
+
+    public void setCredits(int credits) {
+        this.credits = credits;
+    }
+
+    public List<Student> getStudents() {
+        return students;
+    }
+
+    public void setStudents(List<Student> students) {
+        this.students = students;
+    }
+
+    @Override
+    public String toString() {
+        return courseCode + "|" + courseName + "|" + semester + "|" + credits;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Course course = (Course) o;
+        return courseCode.equals(course.courseCode);
+    }
+
+    @Override
+    public int hashCode() {
+        return courseCode.hashCode();
+    }
 }
